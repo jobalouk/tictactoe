@@ -1,25 +1,73 @@
-import logo from './logo.svg';
 import './App.css';
+import React from 'react';
+import { reducer, getInitialState } from './state/reducer';
+import { GAME_STATUS_TEXT, NEXT_TURN } from './enum';
+import { DIMENSIONS, SQUARE_DIMS } from './utils';
 
-function App() {
+
+
+function Game() {
+  // Game state
+  const [state, dispatch] = React.useReducer(reducer, null, getInitialState)
+
+  const { grid, turn, status } = state
+
+  function handleClick(x) {
+    dispatch({type: 'CLICK', payload: {x}})
+    dispatch({type: "AI_MOVE", payload: {}})
+  }
+
+  function reset() {
+    dispatch({type: 'RESET'})
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <>
+      <div>Next turn is {NEXT_TURN[turn]}</div>
+      <div>{GAME_STATUS_TEXT[status](turn)}</div>
+      <button onClick={reset}>reset</button>
+      <Grid grid={grid} handleClick={handleClick} />
+    </>
+    
+  )
 }
 
-export default App;
+
+function Grid({grid, handleClick}) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        width: `calc(${DIMENSIONS} * ${(SQUARE_DIMS + 5)}px)`,
+        justifyContent: "center",
+        flexFlow: "wrap",
+        position: "relative",
+      }}
+    >
+      {grid.map((x, i) => {
+        return (
+          <Cell key={i} cell={x} handleClick={() => handleClick(i)} />
+        )
+      })}        
+    </div>      
+    
+  )
+}
+
+
+const cellStyle = {
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  width: `${SQUARE_DIMS}px`,
+  height: `${SQUARE_DIMS}px`,
+  border: "1px solid black",
+ 
+}
+
+function Cell({ cell, handleClick}) {
+  return <div style={cellStyle} onClick={handleClick}>{NEXT_TURN[cell]}</div>
+}
+
+
+export default Game;
