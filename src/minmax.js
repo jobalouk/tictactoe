@@ -1,5 +1,5 @@
-import {switchPlayer, humanMove} from "./state/reducer"
-import {emptyIndexes, getWinner} from "./utils"
+import {switchPlayer} from "./state/reducer"
+import {getEmptyIndexes, getWinner} from "./utils"
 
 export const DRAW = 0
 export const PLAYER_X = 1
@@ -17,32 +17,60 @@ export const SCORES = {
 
 
 export function minmax(grid, turn) {
-    const multiplier = SCORES[String(turn)]; // Adjust score based on the current player
-    let maxScore = -1
-    let bestMove = null
-
     const winner = getWinner(grid); // Check if the game is over
+
     if (winner) {
-        return [SCORES[winner], 0]; // Return score if there's a winner
+        return SCORES[winner]
     }
 
-    for (const idx of emptyIndexes(grid)) {
-        // Create a fresh copy of the grid for each move simulation
-        const gridCopy = [...grid]
-        
-        humanMove(gridCopy, idx, turn); // Simulate the move
-        const [score] = minmax(gridCopy, switchPlayer()[turn]); // Recursive call with switched player
+    return getBestScore(grid, turn)
+}
 
-        const adjustedScore = multiplier * score;
-        if (adjustedScore >= maxScore) {
-            maxScore = adjustedScore
+
+export function getBestMove(grid) {
+    let bestScore = -Infinity
+	let bestMove
+
+    const emptyIdx = getEmptyIndexes(grid)
+
+    for (const idx of emptyIdx) {
+        const gridCopy = [...grid]
+
+        // IA move
+        gridCopy[idx] = PLAYER_O
+
+        const score = minmax(gridCopy, PLAYER_X);
+
+        if (score > bestScore) {
+            bestScore = score
             bestMove = idx
         }
-        
-        // Undo the move for the next iteration
-        gridCopy[idx] = null
+    }
+    
+    return bestMove
+}
+
+
+function getBestScore(grid, turn) {
+    // Implem in minmax for a little bit of abstraction i guess?
+
+    const isMax = turn === PLAYER_O || turn === PLAYER_X
+
+    // Check player to know if we want to minimize or maximize.
+    let bestScore = isMax ? -Infinity : Infinity;
+    
+    const emptyIdx = getEmptyIndexes(grid)
+
+    for (const idx of emptyIdx) {
+        const gridCopy = [...grid]
+        gridCopy[idx] = turn
+
+        const playerTurn = switchPlayer()[turn]
+        let score = minmax(gridCopy, playerTurn)
+            
+        bestScore = isMax ? Math.max(score, bestScore) : Math.min(score, bestScore)
+
     }
 
-    return [maxScore, bestMove]
+    return bestScore
 }
-    

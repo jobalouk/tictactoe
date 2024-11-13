@@ -32,7 +32,7 @@ export function getWinner(grid) {
       grid[e[0]] === grid[e[2]]
     ) {
       ret = grid[e[0]]
-    } else if (ret === null && emptyIndexes(grid).length === 0) {
+    } else if (ret === null && getEmptyIndexes(grid).length === 0) {
       ret = DRAW
     }
   })
@@ -71,7 +71,7 @@ export function checkForDraw(flatGrid) {
 }
 
 
-export function emptyIndexes(grid) {
+export function getEmptyIndexes(grid) {
   let squares = []
 
   grid.forEach((square, i) => {

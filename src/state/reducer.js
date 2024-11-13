@@ -1,6 +1,6 @@
 import { flatten, checkForDraw, checkForWin, generateGrid, emptyIndexes, getWinner } from "../utils"
 import { NEXT_TURN } from "../enum"
-import { minmax, PLAYER_O, PLAYER_X } from "../minmax"
+import { getBestMove, minmax, PLAYER_O, PLAYER_X } from "../minmax"
 
 
 export function reducer(state, action) {
@@ -9,7 +9,7 @@ export function reducer(state, action) {
     }
 
     const nextState = clone(state)
-
+    
     const { grid, turn } = nextState
 
     switch (action.type) {
@@ -29,10 +29,9 @@ export function reducer(state, action) {
           return nextState
         }
 
-        // switch player
+        // Switch player
         nextState.turn = switchPlayer()[turn]
         
-        // We'll add checks for winning or drawing soon
         return nextState
       case "AI_MOVE":
         aiMove(grid, turn)
@@ -84,7 +83,7 @@ export function humanMove(grid, x, turn) {
 }
 
 export function aiMove(grid, turn) {
-  let index = minmax(grid, turn)[1]
+  let index = getBestMove(grid)
   move(grid, index, turn)
 }
 

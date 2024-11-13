@@ -9,11 +9,13 @@ import { DIMENSIONS, SQUARE_DIMS } from './utils';
 function Game() {
   // Game state
   const [state, dispatch] = React.useReducer(reducer, null, getInitialState)
-
   const { grid, turn, status } = state
 
   function handleClick(x) {
     dispatch({type: 'CLICK', payload: {x}})
+
+    // bad idea to use stacked dispatch? the state does not update like
+    // i imagine
     dispatch({type: "AI_MOVE", payload: {}})
   }
 
