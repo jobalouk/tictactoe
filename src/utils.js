@@ -1,3 +1,6 @@
+import { PLAYER } from "./enum"
+import { COMP, HUMAN, PLAYER_O, PLAYER_X } from "./minmax"
+
 export const DRAW = 0
 export const SQUARE_DIMS = 100
 export const DIMENSIONS = 3
@@ -31,11 +34,12 @@ export function getWinner(grid) {
       grid[e[0]] === grid[e[1]] &&
       grid[e[0]] === grid[e[2]]
     ) {
-      ret = grid[e[0]]
-    } else if (ret === null && getEmptyIndexes(grid).length === 0) {
+      ret = grid[e[0]] // Represented by number. Check constante PLAYER_X and PLAUYER_O.
+    } else if (ret === null && getEmptyCells(grid).length === 0) {
       ret = DRAW
     }
   })
+
   return ret
 }
 
@@ -71,12 +75,46 @@ export function checkForDraw(flatGrid) {
 }
 
 
-export function getEmptyIndexes(grid) {
-  let squares = []
+// export function getEmptyIndexes(grid) { TODO
+//     let ret = []
 
-  grid.forEach((square, i) => {
-    if (square === null) squares.push(i);
+//   for (const rows of grid) {
+//     const filteredList = rows.filter((v, index) => {
+//       return v === null
+//     })
+
+//     ret.push(filteredList)
+//   }
+
+//   return ret
+// }
+
+
+export function getEmptyCells(state) {
+  // save position of empty cells
+  const cells = []
+
+  state.forEach((row, x) => {
+    row.forEach((cell, y) => {
+      if (cell === null) {
+        cells.push([x, y])
+      }
+    })
   })
-
-  return squares
+  
+  return cells
 }
+
+
+export function evaluate(player) {
+  let ret = 0
+
+  if (player === PLAYER_X) {
+    ret = HUMAN
+  } else if (player === PLAYER_O) {
+    ret = COMP
+  }
+
+  return ret  
+}
+

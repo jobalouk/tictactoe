@@ -1,37 +1,111 @@
 import {switchPlayer} from "./state/reducer"
-import {getEmptyIndexes, getWinner} from "./utils"
+import {evaluate, getEmptyCells, getWinner} from "./utils"
 
-export const DRAW = 0
+
+// That is what is in the fucking grid
+// export const DRAW = 0
+
 export const PLAYER_X = 1
+
 export const PLAYER_O = 2
 
 
-export const SCORES = {
-    // player_x
-    1: 1,
-    // draw
-    0: 0,
-    // player_o
-    2: -1,
-}
+export const HUMAN = -1
+export const COMP = +1
 
 
-export function minmax(grid, turn) {
-    const winner = getWinner(grid); // Check if the game is over
-
-    if (winner) {
-        return SCORES[winner]
+export function minmax(grid, depth, player) {   
+    if (depth === 9) {
+        console.log("b")
     }
 
-    return getBestScore(grid, turn)
+    let best = []
+
+    if (player === COMP) {
+        best = [-1,-1, -Infinity]
+    } else {
+        best = [-1,-1, +Infinity]
+    }
+
+    const winner = getWinner(grid)
+ 
+    if (depth === 0 || winner) {
+        let score = evaluate(winner)
+        // The best move is "no move" hence the -1 
+        return [-1,-1,score]
+    }
+
+    const emptyCells = getEmptyCells(grid)
+
+    for (const emptycell of emptyCells) {
+        const gridCopy = grid.map(row => [...row])
+        
+        const [x, y] = emptycell
+
+        // Make the move
+        gridCopy[x][y] = player
+
+        let ret = minmax(gridCopy, depth - 1, -player)
+
+        gridCopy[emptycell[0]][emptycell[1]] = null
+
+        ret[0] = x
+        ret[1] = y
+
+        if (player === COMP) {
+            if (ret[2] > best[2]) {
+                best = [...ret]
+            }
+        } else {
+            if (ret[2] < best[2]) {
+                best = [...ret]
+            }
+        }
+    }
+    
+    return best
+
+    // What we need todo
+    // grid[row][col]
+
+    // Faut retaper ce bout de code aussi
+    // for (const idx of emptyIdx) {
+        // const gridCopy = [...grid]
+
+        // // IA move
+        // gridCopy[idx] = COMP
+
+        // let ret = minmax(gridCopy, depth, -player)
+
+
+    //     gridCopy[idx] = null
+    //     ret[0] = idx
+
+    //     if (player === COMP) {
+    //         if (ret[1] > best[1]) {
+    //             best = ret
+    //         }
+    //     } else {
+    //         if (ret[1] < best[1]) {
+    //             best = ret
+    //         }
+    //     }
+    // }
+
+    // return best
 }
 
 
-export function getBestMove(grid) {
+export function getAiMove(grid) {
     let bestScore = -Infinity
 	let bestMove
 
     const emptyIdx = getEmptyIndexes(grid)
+    const depth = emptyIdx.length
+
+    if (depth === 0 || gameOver(grid)) {
+        return
+    }
 
     for (const idx of emptyIdx) {
         const gridCopy = [...grid]
@@ -39,7 +113,7 @@ export function getBestMove(grid) {
         // IA move
         gridCopy[idx] = PLAYER_O
 
-        const score = minmax(gridCopy, PLAYER_X);
+        const score = minmax(gridCopy, depth, PLAYER_X)
 
         if (score > bestScore) {
             bestScore = score
@@ -51,26 +125,6 @@ export function getBestMove(grid) {
 }
 
 
-function getBestScore(grid, turn) {
-    // Implem in minmax for a little bit of abstraction i guess?
-
-    const isMax = turn === PLAYER_O || turn === PLAYER_X
-
-    // Check player to know if we want to minimize or maximize.
-    let bestScore = isMax ? -Infinity : Infinity;
-    
-    const emptyIdx = getEmptyIndexes(grid)
-
-    for (const idx of emptyIdx) {
-        const gridCopy = [...grid]
-        gridCopy[idx] = turn
-
-        const playerTurn = switchPlayer()[turn]
-        let score = minmax(gridCopy, playerTurn)
-            
-        bestScore = isMax ? Math.max(score, bestScore) : Math.min(score, bestScore)
-
-    }
-
-    return bestScore
+function gameOver(grid) {
+    return (getWinner(grid) === PLAYER_O) || (getWinner(grid) === PLAYER_O)
 }

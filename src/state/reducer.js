@@ -1,6 +1,6 @@
 import { flatten, checkForDraw, checkForWin, generateGrid, emptyIndexes, getWinner } from "../utils"
 import { NEXT_TURN } from "../enum"
-import { getBestMove, minmax, PLAYER_O, PLAYER_X } from "../minmax"
+import { getAiMove, minmax, PLAYER_O, PLAYER_X } from "../minmax"
 
 
 export function reducer(state, action) {
@@ -83,7 +83,7 @@ export function humanMove(grid, x, turn) {
 }
 
 export function aiMove(grid, turn) {
-  let index = getBestMove(grid)
+  let index = getAiMove(grid)
   move(grid, index, turn)
 }
 
