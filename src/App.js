@@ -14,8 +14,8 @@ function Game() {
   function handleClick(x) {
     dispatch({type: 'CLICK', payload: {x}})
 
-    // bad idea to use stacked dispatch? the state does not update like
-    // i imagine
+    // Bad idea to use stacked dispatch? the state does not update like
+    // I imagine TODO.
     dispatch({type: "AI_MOVE", payload: {}})
   }
 
