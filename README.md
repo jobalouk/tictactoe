@@ -15,3 +15,7 @@ This means that each player will always choose the move that best advances their
 Clean front end
 
 Multiplier mode
+
+### States of a game
+
+![diagram states of a game](https://github.com/jobalouk/tictactoe/blob/main/minimax%20diagram.drawio.svg)
